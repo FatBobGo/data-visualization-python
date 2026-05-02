@@ -1,20 +1,23 @@
 /**
  * DataViz — Chart Control Panel
  * Manages column selectors, chart type switching, and real-time chart updates.
+ * Supports multi-Y axis selection for line, scatter, area, and bar charts.
  */
 
 const Controls = (() => {
     /**
-     * Populate column dropdowns from data profile.
+     * Populate column dropdowns and multi-Y checkboxes from data profile.
      */
     function populateColumns(columns) {
         const xSelect = document.getElementById('ctrl-x-column');
         const ySelect = document.getElementById('ctrl-y-column');
+        const multiY = document.getElementById('ctrl-y-multi');
         const multiCols = document.getElementById('ctrl-multi-cols');
 
         // Clear existing
         xSelect.innerHTML = '<option value="">— Select —</option>';
         ySelect.innerHTML = '<option value="">— Select —</option>';
+        multiY.innerHTML = '';
         multiCols.innerHTML = '';
 
         columns.forEach(col => {
@@ -26,7 +29,20 @@ const Controls = (() => {
             const optY = optX.cloneNode(true);
             ySelect.appendChild(optY);
 
-            // Multi-column checkboxes
+            // Multi-Y checkboxes (for multi-series line/scatter/area)
+            const yLabel = document.createElement('label');
+            const yCb = document.createElement('input');
+            yCb.type = 'checkbox';
+            yCb.value = col.name;
+            yCb.dataset.dtype = col.dtype;
+            yLabel.appendChild(yCb);
+            yLabel.appendChild(document.createTextNode(` ${col.name}`));
+            if (col.dtype !== 'numeric') {
+                yLabel.style.opacity = '0.5';
+            }
+            multiY.appendChild(yLabel);
+
+            // Multi-column checkboxes (for heatmap/grouped bar)
             const label = document.createElement('label');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
@@ -53,15 +69,25 @@ const Controls = (() => {
         if (rec.x_column) xSelect.value = rec.x_column;
         if (rec.y_column) ySelect.value = rec.y_column;
 
-        // Show/hide multi-column group for heatmap/grouped bar
-        const multiGroup = document.getElementById('ctrl-multi-cols-group');
-        const needsMulti = ['heatmap', 'grouped_bar', 'stacked_bar'].includes(rec.chart_type);
-        multiGroup.style.display = needsMulti ? 'flex' : 'none';
+        // Reset multi-Y checkboxes
+        const multiYCbs = document.querySelectorAll('#ctrl-y-multi input[type="checkbox"]');
+        multiYCbs.forEach(cb => {
+            cb.checked = false;
+        });
 
-        if (needsMulti && rec.columns.length > 0) {
-            const checkboxes = document.querySelectorAll('#ctrl-multi-cols input[type="checkbox"]');
-            checkboxes.forEach(cb => {
+        // For multi-column chart types (heatmap, grouped_bar, stacked_bar), set multi-cols
+        const multiColsCbs = document.querySelectorAll('#ctrl-multi-cols input[type="checkbox"]');
+        const needsMultiCols = ['heatmap', 'grouped_bar', 'stacked_bar'].includes(rec.chart_type);
+        if (needsMultiCols && rec.columns.length > 0) {
+            multiColsCbs.forEach(cb => {
                 cb.checked = rec.columns.includes(cb.value);
+            });
+        }
+
+        // If single Y column, also check it in multi-Y for convenience
+        if (rec.y_column) {
+            multiYCbs.forEach(cb => {
+                if (cb.value === rec.y_column) cb.checked = true;
             });
         }
 
@@ -70,23 +96,48 @@ const Controls = (() => {
 
     /**
      * Show/hide X/Y selectors based on chart type needs.
+     * Multi-Y types (line, scatter, area, bar) show checkbox list instead of single dropdown.
      */
     function updateVisibility(chartType) {
         const xGroup = document.getElementById('ctrl-x-group');
         const yGroup = document.getElementById('ctrl-y-group');
-        const multiGroup = document.getElementById('ctrl-multi-cols-group');
+        const yMultiGroup = document.getElementById('ctrl-y-multi-group');
+        const multiColsGroup = document.getElementById('ctrl-multi-cols-group');
+        const aggGroup = document.getElementById('ctrl-aggregation-group');
 
-        const needsMulti = ['heatmap', 'grouped_bar', 'stacked_bar'].includes(chartType);
+        const needsMultiCols = ['heatmap', 'grouped_bar', 'stacked_bar'].includes(chartType);
+        const supportsMultiY = ['line', 'scatter', 'area', 'bar'].includes(chartType);
         const needsX = !['box'].includes(chartType);
-        const needsY = !['histogram', 'pie'].includes(chartType) || !needsMulti;
+        const needsSingleY = ['pie', 'histogram', 'box'].includes(chartType);
 
         xGroup.style.display = needsX ? 'flex' : 'none';
-        yGroup.style.display = needsY && !needsMulti ? 'flex' : 'none';
-        multiGroup.style.display = needsMulti ? 'flex' : 'none';
+
+        if (needsMultiCols) {
+            // Heatmap / grouped bar — use the columns checkboxes
+            yGroup.style.display = 'none';
+            yMultiGroup.style.display = 'none';
+            multiColsGroup.style.display = 'flex';
+        } else if (supportsMultiY) {
+            // Line / scatter / area / bar — show multi-Y checkboxes
+            yGroup.style.display = 'none';
+            yMultiGroup.style.display = 'flex';
+            multiColsGroup.style.display = 'none';
+        } else {
+            // Single-Y types (pie, histogram, box)
+            yGroup.style.display = needsSingleY ? 'flex' : 'none';
+            yMultiGroup.style.display = 'none';
+            multiColsGroup.style.display = 'none';
+        }
+
+        // Show aggregation only for bar/pie
+        if (aggGroup) {
+            aggGroup.style.display = ['bar', 'pie'].includes(chartType) ? 'flex' : 'none';
+        }
     }
 
     /**
      * Collect current control values and send chart request to API.
+     * Multi-Y columns are sent as comma-separated `columns` field.
      */
     function updateChart() {
         const sessionId = App.state.sessionId;
@@ -97,14 +148,20 @@ const Controls = (() => {
 
         const chartType = document.getElementById('ctrl-chart-type').value;
         const xColumn = document.getElementById('ctrl-x-column').value;
-        const yColumn = document.getElementById('ctrl-y-column').value;
+        const singleY = document.getElementById('ctrl-y-column').value;
         const title = document.getElementById('ctrl-title').value;
         const xLabel = document.getElementById('ctrl-x-label').value;
         const yLabel = document.getElementById('ctrl-y-label').value;
         const aggregation = document.getElementById('ctrl-aggregation').value;
         const colorScheme = document.getElementById('ctrl-color').value;
 
-        // Collect multi-columns if needed
+        // Collect multi-Y selections
+        const multiYCols = [];
+        document.querySelectorAll('#ctrl-y-multi input:checked').forEach(cb => {
+            multiYCols.push(cb.value);
+        });
+
+        // Collect multi-columns (for heatmap/grouped bar)
         const multiCols = [];
         document.querySelectorAll('#ctrl-multi-cols input:checked').forEach(cb => {
             multiCols.push(cb.value);
@@ -114,13 +171,25 @@ const Controls = (() => {
         formData.append('session_id', sessionId);
         formData.append('chart_type', chartType);
         if (xColumn) formData.append('x_column', xColumn);
-        if (yColumn) formData.append('y_column', yColumn);
         if (title) formData.append('title', title);
         if (xLabel) formData.append('x_label', xLabel);
         if (yLabel) formData.append('y_label', yLabel);
         if (aggregation) formData.append('aggregation', aggregation);
         if (colorScheme) formData.append('color_scheme', colorScheme);
-        if (multiCols.length > 0) formData.append('columns', multiCols.join(','));
+
+        // Determine which columns to send
+        const needsMultiCols = ['heatmap', 'grouped_bar', 'stacked_bar'].includes(chartType);
+        const supportsMultiY = ['line', 'scatter', 'area', 'bar'].includes(chartType);
+
+        if (needsMultiCols && multiCols.length > 0) {
+            formData.append('columns', multiCols.join(','));
+        } else if (supportsMultiY && multiYCols.length > 0) {
+            // Send multi-Y as columns list; first selected becomes y_column for backward compat
+            formData.append('y_column', multiYCols[0]);
+            formData.append('columns', multiYCols.join(','));
+        } else if (singleY) {
+            formData.append('y_column', singleY);
+        }
 
         fetch('/api/chart', {
             method: 'POST',
