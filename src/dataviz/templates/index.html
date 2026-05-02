@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Hero Header -->
+<header class="hero" id="hero-header">
+    <div class="hero-glow"></div>
+    <h1 class="hero-title">
+        <span class="hero-icon">📊</span> DataViz
+    </h1>
+    <p class="hero-subtitle">Upload your data. Get beautiful charts instantly.</p>
+</header>
+
+<!-- Main App Container -->
+<main class="app-container" id="app-main">
+
+    <!-- Upload Section -->
+    <section class="upload-section glass-card fade-in" id="upload-section">
+        <div class="tab-bar" id="upload-tabs">
+            <button class="tab-btn active" data-tab="file-tab" id="btn-file-tab">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Upload File
+            </button>
+            <button class="tab-btn" data-tab="paste-tab" id="btn-paste-tab">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                Paste Data
+            </button>
+            <button class="tab-btn" data-tab="sample-tab" id="btn-sample-tab">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                Try Sample
+            </button>
+        </div>
+
+        <!-- File Upload Tab -->
+        <div class="tab-content active" id="file-tab">
+            <div class="drop-zone" id="drop-zone">
+                <div class="drop-zone-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                </div>
+                <p class="drop-zone-text">Drag & drop your CSV file here</p>
+                <p class="drop-zone-hint">or click to browse</p>
+                <input type="file" id="file-input" accept=".csv,.tsv,.txt" hidden>
+            </div>
+        </div>
+
+        <!-- Paste Data Tab -->
+        <div class="tab-content" id="paste-tab">
+            <textarea class="paste-area" id="paste-area" placeholder="Paste your CSV, TSV, or tab-delimited data here...&#10;&#10;Example:&#10;Name,Age,Score&#10;Alice,25,92&#10;Bob,30,85&#10;Carol,28,91"></textarea>
+            <button class="btn btn-primary" id="btn-parse-paste">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Parse Data
+            </button>
+        </div>
+
+        <!-- Sample Data Tab -->
+        <div class="tab-content" id="sample-tab">
+            <div class="sample-grid" id="sample-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Header Toggle -->
+        <div class="header-toggle" id="header-toggle">
+            <label class="toggle-label">
+                <input type="checkbox" id="has-header-check" checked>
+                <span class="toggle-switch"></span>
+                <span>First row is header</span>
+            </label>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading-overlay" id="loading-overlay" style="display:none;">
+            <div class="spinner"></div>
+            <p>Analyzing your data...</p>
+        </div>
+    </section>
+
+    <!-- Data Preview Section -->
+    <section class="data-preview-section glass-card fade-in" id="data-preview-section" style="display:none;">
+        <div class="section-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+                Data Preview
+            </h2>
+            <span class="data-info" id="data-info"></span>
+        </div>
+        <div class="table-wrapper" id="table-wrapper">
+            <table class="data-table" id="data-table">
+                <thead id="data-table-head"></thead>
+                <tbody id="data-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Chart Gallery Section -->
+    <section class="chart-gallery-section glass-card fade-in" id="chart-gallery-section" style="display:none;">
+        <div class="section-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Recommended Charts
+            </h2>
+            <p class="section-hint">Click a chart to expand and customize</p>
+        </div>
+        <div class="chart-grid" id="chart-grid">
+            <!-- Populated by JS -->
+        </div>
+    </section>
+
+    <!-- Chart Workspace -->
+    <section class="chart-workspace-section glass-card fade-in" id="chart-workspace-section" style="display:none;">
+        <div class="workspace-layout">
+            <!-- Control Panel -->
+            <aside class="control-panel" id="control-panel">
+                <h3 class="panel-title">Chart Controls</h3>
+
+                <div class="control-group">
+                    <label class="control-label" for="ctrl-chart-type">Chart Type</label>
+                    <select class="control-select" id="ctrl-chart-type">
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="scatter">Scatter Plot</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="histogram">Histogram</option>
+                        <option value="box">Box Plot</option>
+                        <option value="area">Area Chart</option>
+                        <option value="heatmap">Heatmap</option>
+                        <option value="grouped_bar">Grouped Bar</option>
+                        <option value="stacked_bar">Stacked Bar</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="ctrl-x-group">
+                    <label class="control-label" for="ctrl-x-column">X Axis</label>
+                    <select class="control-select" id="ctrl-x-column"></select>
+                </div>
+
+                <div class="control-group" id="ctrl-y-group">
+                    <label class="control-label" for="ctrl-y-column">Y Axis</label>
+                    <select class="control-select" id="ctrl-y-column"></select>
+                </div>
+
+                <div class="control-group" id="ctrl-multi-cols-group" style="display:none;">
+                    <label class="control-label">Columns</label>
+                    <div class="checkbox-list" id="ctrl-multi-cols"></div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="ctrl-title">Chart Title</label>
+                    <input type="text" class="control-input" id="ctrl-title" placeholder="Enter chart title">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="ctrl-x-label">X Axis Label</label>
+                    <input type="text" class="control-input" id="ctrl-x-label" placeholder="X axis label">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="ctrl-y-label">Y Axis Label</label>
+                    <input type="text" class="control-input" id="ctrl-y-label" placeholder="Y axis label">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="ctrl-aggregation">Aggregation</label>
+                    <select class="control-select" id="ctrl-aggregation">
+                        <option value="">None</option>
+                        <option value="sum">Sum</option>
+                        <option value="mean">Mean</option>
+                        <option value="count">Count</option>
+                        <option value="min">Min</option>
+                        <option value="max">Max</option>
+                        <option value="median">Median</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="ctrl-color">Color Theme</label>
+                    <select class="control-select" id="ctrl-color">
+                        <option value="default">Default (Indigo)</option>
+                        <option value="ocean">Ocean</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="earth">Earth</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary btn-full" id="btn-update-chart">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Update Chart
+                </button>
+
+                <button class="btn btn-secondary btn-full" id="btn-export-png">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export PNG
+                </button>
+
+                <button class="btn btn-ghost btn-full" id="btn-back-gallery">
+                    ← Back to Gallery
+                </button>
+            </aside>
+
+            <!-- Chart Area -->
+            <div class="chart-area">
+                <div class="chart-container" id="main-chart"></div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- Toast Notification -->
+<div class="toast-container" id="toast-container"></div>
+{% endblock %}
