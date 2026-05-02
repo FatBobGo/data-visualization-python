@@ -1,0 +1,31 @@
+Employee_ID,Department,Role,Years_Experience,Salary,Satisfaction_Score,Work_Life_Balance,Performance_Rating,Remote_Days_Per_Week,Age,Gender
+E001,Engineering,Senior Developer,8,125000,4.2,3.8,4.5,3,34,Male
+E002,Engineering,Junior Developer,2,72000,3.5,4.1,3.8,2,26,Female
+E003,Marketing,Marketing Manager,6,98000,4.0,3.5,4.2,1,31,Female
+E004,Engineering,Tech Lead,12,155000,4.5,3.2,4.8,4,40,Male
+E005,Sales,Sales Rep,3,65000,3.2,3.9,3.5,0,28,Male
+E006,HR,HR Specialist,5,78000,4.1,4.3,4.0,2,33,Female
+E007,Engineering,DevOps Engineer,7,118000,3.8,3.4,4.3,5,36,Male
+E008,Marketing,Content Writer,4,68000,3.9,4.5,3.9,3,29,Female
+E009,Sales,Account Executive,5,82000,3.0,3.1,3.6,1,32,Male
+E010,Engineering,Senior Developer,10,138000,4.3,3.6,4.6,4,38,Female
+E011,Finance,Financial Analyst,4,85000,3.7,4.0,4.1,2,30,Male
+E012,Engineering,Junior Developer,1,65000,3.8,4.2,3.4,2,24,Male
+E013,Marketing,SEO Specialist,3,72000,4.2,4.4,4.0,3,27,Female
+E014,HR,HR Manager,9,105000,4.0,3.7,4.4,2,37,Female
+E015,Sales,Sales Manager,8,110000,3.5,2.8,4.2,1,35,Male
+E016,Engineering,Data Engineer,6,128000,4.1,3.5,4.5,4,33,Female
+E017,Finance,Senior Accountant,7,92000,3.6,3.9,4.0,1,34,Male
+E018,Engineering,Frontend Developer,4,95000,3.9,4.1,4.1,3,28,Male
+E019,Marketing,Brand Manager,5,88000,4.3,4.0,4.3,2,31,Female
+E020,Sales,Sales Rep,2,60000,2.8,3.5,3.2,0,25,Female
+E021,Engineering,ML Engineer,5,135000,4.4,3.3,4.7,5,32,Male
+E022,HR,Recruiter,3,70000,3.7,4.2,3.8,2,27,Female
+E023,Finance,CFO,15,195000,4.1,2.5,4.9,2,45,Male
+E024,Engineering,Senior Developer,9,142000,4.0,3.4,4.4,4,37,Female
+E025,Marketing,Digital Marketer,3,75000,3.8,4.3,3.9,3,28,Male
+E026,Sales,Account Executive,4,78000,3.3,3.2,3.7,1,30,Female
+E027,Engineering,QA Engineer,6,98000,3.6,4.0,4.0,3,34,Male
+E028,Finance,Financial Analyst,3,80000,3.9,4.1,3.8,2,29,Female
+E029,Engineering,CTO,18,220000,4.6,2.2,4.9,3,48,Male
+E030,HR,Training Coordinator,4,72000,4.2,4.5,4.1,2,30,Female

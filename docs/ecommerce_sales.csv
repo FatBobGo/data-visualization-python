@@ -1,0 +1,31 @@
+Order_ID,Date,Product_Category,Product_Name,Quantity,Unit_Price,Total_Amount,Customer_Region,Payment_Method,Rating
+1001,2024-01-05,Electronics,Wireless Mouse,2,29.99,59.98,North America,Credit Card,4.5
+1002,2024-01-07,Clothing,Denim Jacket,1,89.50,89.50,Europe,PayPal,4.2
+1003,2024-01-10,Electronics,USB-C Hub,3,45.00,135.00,Asia,Credit Card,4.8
+1004,2024-01-12,Books,Python Cookbook,2,55.99,111.98,North America,Debit Card,4.9
+1005,2024-01-15,Home & Garden,Plant Pot Set,4,18.75,75.00,Europe,Credit Card,3.8
+1006,2024-01-18,Electronics,Bluetooth Speaker,1,120.00,120.00,Asia,PayPal,4.6
+1007,2024-01-22,Clothing,Running Shoes,1,145.00,145.00,North America,Credit Card,4.1
+1008,2024-01-25,Books,Data Science Handbook,3,42.50,127.50,Europe,Debit Card,4.7
+1009,2024-02-01,Home & Garden,LED Grow Light,2,65.00,130.00,North America,PayPal,4.3
+1010,2024-02-04,Electronics,Webcam HD,1,79.99,79.99,Asia,Credit Card,4.0
+1011,2024-02-08,Clothing,Winter Coat,1,210.00,210.00,Europe,Credit Card,4.4
+1012,2024-02-12,Books,Machine Learning A-Z,1,49.99,49.99,North America,Debit Card,4.8
+1013,2024-02-15,Electronics,Mechanical Keyboard,2,95.00,190.00,Asia,PayPal,4.7
+1014,2024-02-18,Home & Garden,Garden Tool Kit,1,38.50,38.50,Europe,Credit Card,3.9
+1015,2024-02-22,Clothing,Yoga Pants,3,35.00,105.00,North America,Credit Card,4.5
+1016,2024-03-01,Electronics,Monitor Stand,1,55.00,55.00,Asia,Debit Card,4.2
+1017,2024-03-05,Books,Clean Code,2,39.99,79.98,North America,PayPal,4.9
+1018,2024-03-08,Home & Garden,Herb Planter,5,12.99,64.95,Europe,Credit Card,4.1
+1019,2024-03-12,Clothing,Sneakers,1,130.00,130.00,Asia,Credit Card,4.6
+1020,2024-03-15,Electronics,Portable SSD,1,89.99,89.99,North America,Debit Card,4.8
+1021,2024-03-18,Books,Design Patterns,1,52.00,52.00,Europe,PayPal,4.3
+1022,2024-03-22,Home & Garden,Outdoor Lights,3,22.50,67.50,North America,Credit Card,4.0
+1023,2024-03-25,Electronics,Noise Cancelling Earbuds,2,75.00,150.00,Asia,Credit Card,4.7
+1024,2024-04-01,Clothing,Linen Shirt,2,48.00,96.00,Europe,Debit Card,4.2
+1025,2024-04-05,Books,System Design Interview,1,45.99,45.99,North America,PayPal,4.9
+1026,2024-04-10,Electronics,Laptop Stand,1,42.00,42.00,Asia,Credit Card,4.4
+1027,2024-04-14,Home & Garden,Compost Bin,2,28.99,57.98,Europe,Credit Card,3.7
+1028,2024-04-18,Clothing,Hiking Boots,1,175.00,175.00,North America,Credit Card,4.5
+1029,2024-04-22,Books,The Pragmatic Programmer,3,48.50,145.50,Asia,Debit Card,4.8
+1030,2024-04-25,Electronics,Smart Plug 4-Pack,2,34.99,69.98,North America,PayPal,4.3
