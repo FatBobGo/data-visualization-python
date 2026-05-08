@@ -115,6 +115,17 @@ def recommend_charts(df: pd.DataFrame, profile: DataProfile) -> list[ChartRecomm
         cols = num[:4]
         recs.append(ChartRecommendation(chart_type=ChartType.GROUPED_BAR, title=f"Comparison by {c}",
             description=f"Grouped bar comparing {len(cols)} metrics across {c}", x_column=c, columns=[c] + cols, score=0.85))
+        # Multi-series line chart for categorical + multi-numeric (e.g. Month + Sales metrics)
+        if df[c].nunique() <= 30:
+            recs.append(ChartRecommendation(
+                chart_type=ChartType.LINE,
+                title=f"{', '.join(cols[:3])} Trends by {c}",
+                description=f"Line chart comparing {len(cols)} metrics across {c}",
+                x_column=c,
+                y_column=cols[0],
+                columns=[c] + cols,
+                score=0.90,
+            ))
 
     recs.sort(key=lambda r: r.score, reverse=True)
     for rec in recs:

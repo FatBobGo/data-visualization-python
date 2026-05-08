@@ -208,11 +208,88 @@ const Controls = (() => {
             });
     }
 
+    /**
+     * Get current control panel values as a plain object (for template saving).
+     */
+    function getControlValues() {
+        const chartType = document.getElementById('ctrl-chart-type').value;
+        const xColumn = document.getElementById('ctrl-x-column').value;
+        const singleY = document.getElementById('ctrl-y-column').value;
+        const title = document.getElementById('ctrl-title').value;
+        const xLabel = document.getElementById('ctrl-x-label').value;
+        const yLabel = document.getElementById('ctrl-y-label').value;
+        const aggregation = document.getElementById('ctrl-aggregation').value;
+        const colorScheme = document.getElementById('ctrl-color').value;
+
+        // Collect multi-Y selections
+        const multiYCols = [];
+        document.querySelectorAll('#ctrl-y-multi input:checked').forEach(cb => {
+            multiYCols.push(cb.value);
+        });
+
+        // Collect multi-columns
+        const multiCols = [];
+        document.querySelectorAll('#ctrl-multi-cols input:checked').forEach(cb => {
+            multiCols.push(cb.value);
+        });
+
+        return {
+            chart_type: chartType,
+            x_column: xColumn,
+            y_column: singleY,
+            columns: multiYCols.length > 0 ? multiYCols : multiCols,
+            title: title,
+            x_label: xLabel,
+            y_label: yLabel,
+            aggregation: aggregation,
+            color_scheme: colorScheme,
+        };
+    }
+
+    /**
+     * Apply a saved template object to the control panel.
+     */
+    function applyTemplate(template) {
+        const typeSelect = document.getElementById('ctrl-chart-type');
+        const xSelect = document.getElementById('ctrl-x-column');
+        const ySelect = document.getElementById('ctrl-y-column');
+        const titleInput = document.getElementById('ctrl-title');
+        const xLabelInput = document.getElementById('ctrl-x-label');
+        const yLabelInput = document.getElementById('ctrl-y-label');
+        const aggSelect = document.getElementById('ctrl-aggregation');
+        const colorSelect = document.getElementById('ctrl-color');
+
+        if (template.chart_type) typeSelect.value = template.chart_type;
+        if (template.x_column) xSelect.value = template.x_column;
+        if (template.y_column) ySelect.value = template.y_column;
+        titleInput.value = template.title || '';
+        xLabelInput.value = template.x_label || '';
+        yLabelInput.value = template.y_label || '';
+        aggSelect.value = template.aggregation || '';
+        colorSelect.value = template.color_scheme || 'default';
+
+        // Apply multi-Y checkboxes
+        const multiYCbs = document.querySelectorAll('#ctrl-y-multi input[type="checkbox"]');
+        multiYCbs.forEach(cb => {
+            cb.checked = template.columns && template.columns.includes(cb.value);
+        });
+
+        // Apply multi-columns checkboxes
+        const multiColsCbs = document.querySelectorAll('#ctrl-multi-cols input[type="checkbox"]');
+        multiColsCbs.forEach(cb => {
+            cb.checked = template.columns && template.columns.includes(cb.value);
+        });
+
+        updateVisibility(template.chart_type || 'bar');
+    }
+
     return {
         populateColumns,
         setFromRecommendation,
         updateChart,
         updateVisibility,
+        getControlValues,
+        applyTemplate,
     };
 })();
 

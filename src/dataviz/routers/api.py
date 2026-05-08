@@ -233,6 +233,48 @@ async def transform_data(
     return UploadResponse(session_id=session_id, profile=new_profile, recommendations=recommendations)
 
 
+@router.post("/batch-rename", response_model=UploadResponse)
+async def batch_rename(
+    session_id: str = Form(...),
+    headers: str = Form(...),
+):
+    """Rename all columns at once using a comma-separated header string.
+
+    The number of names must match the number of columns in the dataset.
+    """
+    session = _get_session(session_id)
+    df = session["df"]
+
+    new_names = [h.strip() for h in headers.split(",")]
+    if len(new_names) != len(df.columns):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Expected {len(df.columns)} column names, got {len(new_names)}",
+        )
+
+    # Check for empty names
+    if any(not name for name in new_names):
+        raise HTTPException(status_code=400, detail="Column names cannot be empty")
+
+    # Check for duplicates
+    if len(set(new_names)) != len(new_names):
+        raise HTTPException(status_code=400, detail="Column names must be unique")
+
+    rename_map = dict(zip(df.columns, new_names))
+    new_df = df.rename(columns=rename_map)
+
+    # Re-parse profile from renamed data
+    csv_text = new_df.to_csv(index=False)
+    _, new_profile = parse_csv_text(csv_text, has_header=True)
+
+    # Update session
+    _sessions[session_id] = {"df": new_df, "profile": new_profile}
+    recommendations = recommend_charts(new_df, new_profile)
+    logger.info("Batch renamed %d columns in session %s", len(new_names), session_id)
+
+    return UploadResponse(session_id=session_id, profile=new_profile, recommendations=recommendations)
+
+
 @router.get("/sample-data")
 async def list_sample_data():
     """List available sample datasets."""

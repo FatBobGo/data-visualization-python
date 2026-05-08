@@ -218,6 +218,60 @@ const App = (() => {
         return text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
+    /**
+     * Apply batch column headers from comma-separated input.
+     */
+    function applyBatchHeaders() {
+        const input = document.getElementById('batch-header-input');
+        const value = input.value.trim();
+        if (!value) {
+            showToast('Please enter column names separated by commas', 'error');
+            return;
+        }
+
+        const colCount = state.profile ? state.profile.columns.length : 0;
+        const names = value.split(',').map(s => s.trim());
+
+        if (names.length !== colCount) {
+            showToast(`Expected ${colCount} column names, got ${names.length}`, 'error');
+            return;
+        }
+
+        if (names.some(n => !n)) {
+            showToast('Column names cannot be empty', 'error');
+            return;
+        }
+
+        showLoading(true);
+
+        const formData = new FormData();
+        formData.append('session_id', state.sessionId);
+        formData.append('headers', value);
+
+        fetch('/api/batch-rename', {
+            method: 'POST',
+            body: formData,
+        })
+            .then(res => {
+                if (!res.ok) return res.json().then(data => { throw new Error(data.detail || 'Batch rename failed'); });
+                return res.json();
+            })
+            .then(data => {
+                showLoading(false);
+                state.profile = data.profile;
+                state.recommendations = data.recommendations;
+                renderDataPreview(data.profile);
+                ChartModule.renderGallery(data.recommendations);
+                showToast(`Renamed ${names.length} columns successfully`, 'success');
+                // Clear the input
+                input.value = '';
+            })
+            .catch(err => {
+                showLoading(false);
+                showToast(err.message, 'error');
+            });
+    }
+
     // Public API
     return {
         state,
@@ -227,6 +281,7 @@ const App = (() => {
         renderDataPreview,
         escapeHtml,
         startHeaderEdit,
+        applyBatchHeaders,
     };
 })();
 
@@ -240,6 +295,17 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active');
             document.getElementById(btn.dataset.tab).classList.add('active');
         });
+    });
+
+    // Batch header apply button
+    document.getElementById('btn-apply-batch-headers').addEventListener('click', App.applyBatchHeaders);
+
+    // Allow Enter key in batch header input
+    document.getElementById('batch-header-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            App.applyBatchHeaders();
+        }
     });
 
     // Load sample data list

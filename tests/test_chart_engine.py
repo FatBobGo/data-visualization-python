@@ -79,6 +79,29 @@ class TestRecommendCharts:
         types = [r.chart_type for r in recs]
         assert ChartType.LINE in types
 
+    def test_categorical_and_multi_numeric_recommends_line(self):
+        """Line chart should be recommended for categorical + multi-numeric data."""
+        df = pd.DataFrame({
+            "Month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            "Electronics": [12500, 13100, 14800, 15200, 16700, 18100],
+            "Clothing": [8200, 7800, 9100, 10500, 11200, 12800],
+            "Food": [15600, 14200, 16800, 15100, 17300, 16500],
+        })
+        profile = _build_profile([
+            ColumnProfile(name="Month", dtype=ColumnType.CATEGORICAL, unique_count=6),
+            ColumnProfile(name="Electronics", dtype=ColumnType.NUMERIC),
+            ColumnProfile(name="Clothing", dtype=ColumnType.NUMERIC),
+            ColumnProfile(name="Food", dtype=ColumnType.NUMERIC),
+        ])
+        recs = recommend_charts(df, profile)
+        types = [r.chart_type for r in recs]
+        assert ChartType.LINE in types
+        # Find the line chart with categorical x-axis
+        line_recs = [r for r in recs if r.chart_type == ChartType.LINE and r.x_column == "Month"]
+        assert len(line_recs) >= 1
+        # Should have multi-Y columns
+        assert len(line_recs[0].columns) > 2  # x_col + at least 2 y_cols
+
     def test_sorted_by_score(self, sample_dataframe):
         profile = _build_profile([
             ColumnProfile(name="Category", dtype=ColumnType.CATEGORICAL, unique_count=3),

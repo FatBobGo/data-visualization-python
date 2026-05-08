@@ -88,8 +88,17 @@
         </div>
         <!-- Banner for editing auto-generated column headers -->
         <div class="header-edit-banner" id="header-edit-banner" style="display:none;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            <span>Auto-generated column names detected. Click a header to rename it.</span>
+            <div class="banner-top">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <span>Auto-generated column names detected. Click a header to rename, or set all at once:</span>
+            </div>
+            <div class="batch-header-row" id="batch-header-row">
+                <input type="text" class="batch-header-input" id="batch-header-input" placeholder="e.g. Name, Age, Score">
+                <button class="btn btn-sm btn-primary" id="btn-apply-batch-headers">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Apply
+                </button>
+            </div>
         </div>
         <div class="table-wrapper" id="table-wrapper">
             <table class="data-table" id="data-table">
@@ -203,6 +212,22 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Export PNG
                 </button>
+
+                <button class="btn btn-accent btn-full" id="btn-save-template">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Save as Template
+                </button>
+
+                <!-- Saved Templates Panel -->
+                <div class="templates-panel" id="templates-panel">
+                    <h4 class="templates-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+                        Saved Templates
+                    </h4>
+                    <div class="template-list" id="template-list">
+                        <p class="template-empty" id="template-empty">No templates saved yet</p>
+                    </div>
+                </div>
 
                 <button class="btn btn-ghost btn-full" id="btn-back-gallery">
                     ← Back to Gallery

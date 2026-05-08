@@ -150,6 +150,82 @@ class TestTransform:
         assert "Name" not in col_names
 
 
+class TestBatchRename:
+
+    def test_batch_rename_success(self, client):
+        """Batch rename all columns at once."""
+        resp = client.post("/api/sample-data/students")
+        session_id = resp.json()["session_id"]
+
+        response = client.post(
+            "/api/batch-rename",
+            data={
+                "session_id": session_id,
+                "headers": "Student,Mathematics,Science,English,Letter",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+        col_names = [c["name"] for c in data["profile"]["columns"]]
+        assert col_names == ["Student", "Mathematics", "Science", "English", "Letter"]
+
+    def test_batch_rename_count_mismatch(self, client):
+        """Should fail when header count doesn't match column count."""
+        resp = client.post("/api/sample-data/students")
+        session_id = resp.json()["session_id"]
+
+        response = client.post(
+            "/api/batch-rename",
+            data={
+                "session_id": session_id,
+                "headers": "A,B,C",
+            },
+        )
+        assert response.status_code == 400
+        assert "Expected" in response.json()["detail"]
+
+    def test_batch_rename_empty_name(self, client):
+        """Should fail when any column name is empty."""
+        resp = client.post("/api/sample-data/students")
+        session_id = resp.json()["session_id"]
+
+        response = client.post(
+            "/api/batch-rename",
+            data={
+                "session_id": session_id,
+                "headers": "A,,C,D,E",
+            },
+        )
+        assert response.status_code == 400
+        assert "empty" in response.json()["detail"].lower()
+
+    def test_batch_rename_duplicate_names(self, client):
+        """Should fail when column names are not unique."""
+        resp = client.post("/api/sample-data/students")
+        session_id = resp.json()["session_id"]
+
+        response = client.post(
+            "/api/batch-rename",
+            data={
+                "session_id": session_id,
+                "headers": "A,B,A,D,E",
+            },
+        )
+        assert response.status_code == 400
+        assert "unique" in response.json()["detail"].lower()
+
+    def test_batch_rename_invalid_session(self, client):
+        """Should fail with 404 for invalid session."""
+        response = client.post(
+            "/api/batch-rename",
+            data={
+                "session_id": "nonexistent",
+                "headers": "A,B,C",
+            },
+        )
+        assert response.status_code == 404
+
+
 class TestPageRoutes:
 
     def test_index_page(self, client):
