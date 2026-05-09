@@ -311,4 +311,58 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('ctrl-chart-type').addEventListener('change', (e) => {
         Controls.updateVisibility(e.target.value);
     });
+
+    // --- Chart toolbar controls ---
+
+    // Height slider
+    const heightSlider = document.getElementById('chart-height-slider');
+    const heightValue = document.getElementById('height-value');
+    if (heightSlider) {
+        heightSlider.addEventListener('input', (e) => {
+            const h = parseInt(e.target.value, 10);
+            heightValue.textContent = h + 'px';
+            ChartModule.setChartHeight(h);
+        });
+    }
+
+    // Fullscreen button
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    if (btnFullscreen) {
+        btnFullscreen.addEventListener('click', ChartModule.enterFullscreen);
+    }
+
+    // Exit fullscreen
+    const btnExitFs = document.getElementById('btn-exit-fullscreen');
+    if (btnExitFs) {
+        btnExitFs.addEventListener('click', ChartModule.exitFullscreen);
+    }
+
+    // Zoom reset (workspace)
+    const btnZoomReset = document.getElementById('btn-zoom-reset');
+    if (btnZoomReset) {
+        btnZoomReset.addEventListener('click', ChartModule.resetZoom);
+    }
+
+    // Fullscreen zoom reset
+    const btnFsZoomReset = document.getElementById('btn-fs-zoom-reset');
+    if (btnFsZoomReset) {
+        btnFsZoomReset.addEventListener('click', ChartModule.resetZoomFullscreen);
+    }
+
+    // Fullscreen export PNG
+    const btnFsExport = document.getElementById('btn-fs-export');
+    if (btnFsExport) {
+        btnFsExport.addEventListener('click', ChartModule.exportFullscreenPng);
+    }
+
+    // Escape key to exit fullscreen
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const overlay = document.getElementById('fullscreen-overlay');
+            if (overlay && overlay.classList.contains('active')) {
+                ChartModule.exitFullscreen();
+            }
+        }
+    });
 });
+

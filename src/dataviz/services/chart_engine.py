@@ -47,15 +47,25 @@ _BASE_LAYOUT: dict[str, Any] = {
     "paper_bgcolor": "rgba(0,0,0,0)",
     "plot_bgcolor": "rgba(0,0,0,0)",
     "font": {"family": "Inter, system-ui, sans-serif", "color": "#e2e8f0", "size": 13},
-    "margin": {"l": 60, "r": 30, "t": 50, "b": 60},
-    "xaxis": {"gridcolor": "rgba(148,163,184,0.12)", "zerolinecolor": "rgba(148,163,184,0.2)"},
-    "yaxis": {"gridcolor": "rgba(148,163,184,0.12)", "zerolinecolor": "rgba(148,163,184,0.2)"},
+    "margin": {"l": 60, "r": 30, "t": 50, "b": 60, "autoexpand": True},
+    "xaxis": {
+        "gridcolor": "rgba(148,163,184,0.12)",
+        "zerolinecolor": "rgba(148,163,184,0.2)",
+        "automargin": True,
+        "tickangle": -45,
+    },
+    "yaxis": {
+        "gridcolor": "rgba(148,163,184,0.12)",
+        "zerolinecolor": "rgba(148,163,184,0.2)",
+        "automargin": True,
+    },
     "legend": {"bgcolor": "rgba(0,0,0,0)", "font": {"color": "#cbd5e1"}},
     "hoverlabel": {
         "bgcolor": "#1e293b",
-        "font": {"color": "#f1f5f9", "family": "Inter, system-ui, sans-serif"},
+        "font": {"color": "#f1f5f9", "family": "Inter, system-ui, sans-serif", "size": 13},
         "bordercolor": "#475569",
     },
+    "hovermode": "closest",
 }
 
 

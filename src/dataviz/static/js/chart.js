@@ -1,14 +1,17 @@
 /**
  * DataViz — Chart Rendering Module
- * Renders Plotly.js charts in the gallery and workspace.
+ * Renders Plotly.js charts in the gallery, workspace, and fullscreen mode.
+ * Optimized for large datasets with zoom, pan, height control, and fullscreen.
  */
 
 const ChartModule = (() => {
+    // Shared Plotly config — enables scroll zoom and pan for exploring large data
     const PLOTLY_CONFIG = {
         responsive: true,
         displayModeBar: true,
         modeBarButtonsToRemove: ['lasso2d', 'select2d'],
         displaylogo: false,
+        scrollZoom: true,
         toImageButtonOptions: {
             format: 'png',
             filename: 'dataviz_chart',
@@ -17,6 +20,10 @@ const ChartModule = (() => {
             scale: 2,
         },
     };
+
+    // Track the current chart data/layout for fullscreen re-render
+    let _currentData = null;
+    let _currentLayout = null;
 
     /**
      * Render the chart gallery with thumbnail previews.
@@ -57,6 +64,7 @@ const ChartModule = (() => {
                     ...PLOTLY_CONFIG,
                     displayModeBar: false,
                     staticPlot: true,
+                    scrollZoom: false,
                 });
             }, 50 * idx);
         });
@@ -86,7 +94,7 @@ const ChartModule = (() => {
     }
 
     /**
-     * Render chart in the main workspace.
+     * Render chart in the main workspace with large-data-friendly settings.
      */
     function renderMainChart(data, layout) {
         const container = document.getElementById('main-chart');
@@ -96,9 +104,121 @@ const ChartModule = (() => {
             title: { ...layout.title, font: { size: 18 } },
             font: { size: 13, family: 'Inter, system-ui, sans-serif', color: '#e2e8f0' },
             autosize: true,
+            // Enable drag-to-zoom and double-click-to-reset for exploring data
+            dragmode: 'zoom',
         };
 
+        // Store for fullscreen re-render
+        _currentData = data;
+        _currentLayout = fullLayout;
+
         Plotly.newPlot(container, data, fullLayout, PLOTLY_CONFIG);
+    }
+
+    /**
+     * Open fullscreen view with the current chart.
+     */
+    function enterFullscreen() {
+        if (!_currentData || !_currentLayout) {
+            App.showToast('No chart to expand. Select a chart first.', 'error');
+            return;
+        }
+
+        const overlay = document.getElementById('fullscreen-overlay');
+        const fsChart = document.getElementById('fullscreen-chart');
+        const fsTitle = document.getElementById('fullscreen-title');
+
+        // Set title from current layout
+        const titleText = _currentLayout.title?.text || 'Chart';
+        fsTitle.textContent = titleText;
+
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Render in fullscreen container with generous margins
+        const fsLayout = {
+            ..._currentLayout,
+            margin: { l: 80, r: 50, t: 70, b: 70 },
+            title: { ..._currentLayout.title, font: { size: 22 } },
+            font: { size: 14, family: 'Inter, system-ui, sans-serif', color: '#e2e8f0' },
+            autosize: true,
+            dragmode: 'zoom',
+        };
+
+        // Small delay to allow CSS transition/display to settle
+        requestAnimationFrame(() => {
+            Plotly.newPlot(fsChart, _currentData, fsLayout, {
+                ...PLOTLY_CONFIG,
+                toImageButtonOptions: {
+                    format: 'png',
+                    filename: 'dataviz_chart_fullscreen',
+                    height: 1200,
+                    width: 1920,
+                    scale: 2,
+                },
+            });
+        });
+    }
+
+    /**
+     * Exit fullscreen view.
+     */
+    function exitFullscreen() {
+        const overlay = document.getElementById('fullscreen-overlay');
+        const fsChart = document.getElementById('fullscreen-chart');
+
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+
+        // Purge the fullscreen plotly instance to free memory
+        Plotly.purge(fsChart);
+    }
+
+    /**
+     * Set the chart container height (inline workspace).
+     */
+    function setChartHeight(height) {
+        const container = document.getElementById('main-chart');
+        container.style.minHeight = height + 'px';
+
+        // Trigger Plotly resize to fill the new height
+        Plotly.Plots.resize(container);
+    }
+
+    /**
+     * Reset zoom on the main workspace chart.
+     */
+    function resetZoom() {
+        const container = document.getElementById('main-chart');
+        Plotly.relayout(container, {
+            'xaxis.autorange': true,
+            'yaxis.autorange': true,
+        });
+    }
+
+    /**
+     * Reset zoom on the fullscreen chart.
+     */
+    function resetZoomFullscreen() {
+        const fsChart = document.getElementById('fullscreen-chart');
+        Plotly.relayout(fsChart, {
+            'xaxis.autorange': true,
+            'yaxis.autorange': true,
+        });
+    }
+
+    /**
+     * Export the fullscreen chart as PNG.
+     */
+    function exportFullscreenPng() {
+        const fsChart = document.getElementById('fullscreen-chart');
+        Plotly.downloadImage(fsChart, {
+            format: 'png',
+            width: 1920,
+            height: 1200,
+            scale: 2,
+            filename: 'dataviz_chart_fullscreen',
+        });
     }
 
     /**
@@ -119,6 +239,12 @@ const ChartModule = (() => {
         renderGallery,
         openInWorkspace,
         renderMainChart,
+        enterFullscreen,
+        exitFullscreen,
+        setChartHeight,
+        resetZoom,
+        resetZoomFullscreen,
+        exportFullscreenPng,
         exportPng,
     };
 })();
